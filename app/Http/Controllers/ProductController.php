@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Exception;
-use Illuminate\Contracts\Session\Session;
+// use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
+use Session;
+// use Spatie\Backtrace\File;
+use File;
 
 class ProductController extends Controller
 {
@@ -22,6 +25,8 @@ class ProductController extends Controller
 
     public function store(Request $request){
 
+//ONLY for data show---->START CODE//
+
         // try{
         //     $data = $request->all();
         //     Product::create($data);
@@ -30,22 +35,30 @@ class ProductController extends Controller
         //     dd($e->getMessage());
         // }
 
+        //ONLY for data show---->END CODE//
+
+        //for image and data show---->START CODE//
+
         $request->validate([
             'name'=>'required',
             'image'=>'required|mimes:png,jpg,jpeg',
+            'price'=>'required',
         ]);
         $imageName='';
         if($image=$request->file('image')){
             $imageName=time().'-'.uniqid().'.'.$image->getClientOriginalExtension();
-            $image->move('images/products'.$imageName);
+            $image->move('images/products',$imageName);
         }
 
         Product::create([
             'name'=>$request->name,
             'image'=>$imageName,
+            'price'=>$request->price,
         ]);
-        $request->session()->flash('status', 'Task was successful!');
+        session()->flash('message', 'Post successfully updated.');
         return redirect()->route('index');
+
+        //for image and data show---->END CODE//
     }
 
 
@@ -58,14 +71,44 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        try{
-            $data = $request->except('_token');
-            Product::where('id', $id)->update($data);
-            return redirect()->route('index');
+        // try{
+        //     $data = $request->except('_token');
+        //     Product::where('id', $id)->update($data);
+        //     return redirect()->route('index');
 
-        }catch(Exception $e){
-            dd($e->getMessage());
+        // }catch(Exception $e){
+        //     dd($e->getMessage());
+        // }
+
+        //for image and data show---->START CODE//
+$product= Product::findOrFail($id);
+        $request->validate([
+            'name'=>'required',
+            'price'=>'required',
+        ]);
+        $imageName='';
+        $deleteOldImage= 'images/products/'.$product->image;
+
+        if($image=$request->file('image')){
+            if(file_exists($deleteOldImage)){
+                File::delete($deleteOldImage);
+            }
+            else{
+                $imageName=$product->image;
+            }
+            $imageName=time().'-'.uniqid().'.'.$image->getClientOriginalExtension();
+            $image->move('images/products',$imageName);
         }
+
+        Product::where('id', $id)->update([
+            'name'=>$request->name,
+            'image'=>$imageName,
+            'price'=>$request->price,
+        ]);
+        session()->flash('message', 'Post successfully updated.');
+        return redirect()->route('index');
+
+        //for image and data show---->END CODE//
     }
 
     public function delete($id)

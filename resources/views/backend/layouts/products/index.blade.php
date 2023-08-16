@@ -27,11 +27,11 @@
                 @php
                     $i=1
                 @endphp
-                @foreach ($products as $product)
+                @foreach ($products as $key=>$product)
                 <tr>
                     <td>{{$i++}}</td>
                     <td>
-                        <img src="{{asset('images/products/'.$product->image)}}" alt="">
+                        <img style="width:150px;" src="{{asset('images/products/'.$product->image)}}" alt="">
                     </td>
                     <td>{{$product->name}}</td>
                     <td>{{$product->price}}</td>

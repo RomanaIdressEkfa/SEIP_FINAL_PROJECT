@@ -13,11 +13,25 @@
     <div class="container mt-5">
         <h1>Index Form</h1>
 
+                @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @if (Session::has('msg'))
+        <p class="alert alert-success">{{Session::get('msg')}}</p>
+        @endif
+
         <form action="{{route('update',$product->id)}}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
                 <label for="title" class="form-label">Image</label>
-                <img src="{{asset('images/products/'.$product->image)}}" alt="">
+                <img style="width: 150px;" src="{{asset('images/products/'.$product->image)}}" alt="">
                 <input type="file" class="form-control" id="image" name="image" value="{{$product->title}}" required>
             </div>
             <div class="mb-3">
@@ -25,8 +39,8 @@
                 <input type="text" class="form-control" id="name" name="name" value="{{$product->name}}" required>
             </div>
             <div class="mb-3">
-                <label for="description" class="form-label">Price</label>
-              <input type="number" name="price" id="price" value="{{$product->price}}">
+                <label for="price" class="form-label">Price</label>
+              <input type="number" class="form-control" name="price" id="price" value="{{$product->price}}">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
